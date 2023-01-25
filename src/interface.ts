@@ -1,6 +1,6 @@
 export interface IListsRequest {
   listName: string;
-  data: IProductList;
+  data: IProductList[];
 }
 
 export interface IProductList {

@@ -1,3 +1,5 @@
-import { IListsRequest } from "./interface";
+import { IList } from "./interface";
 
-export const lists: IListsRequest[] = [];
+export const lists: IList[] = [];
+
+export const ids: Array<number> = [];
