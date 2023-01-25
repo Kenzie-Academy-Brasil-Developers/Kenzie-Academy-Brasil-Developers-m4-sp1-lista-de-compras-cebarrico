@@ -8,6 +8,9 @@ export interface IProductList {
   quantity: string;
 }
 
+export type CreateListRequired = "listName" | "data";
+export type CreateItensRequired = "name" | "quantity";
+
 export interface IList extends IListsRequest {
   id: number;
 }

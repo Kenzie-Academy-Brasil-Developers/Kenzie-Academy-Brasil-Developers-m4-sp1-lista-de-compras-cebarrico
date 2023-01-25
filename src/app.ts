@@ -1,22 +1,27 @@
 import express, { Application } from "express";
 import {
+  listExist,
+  itemExist,
   createList,
   getAllLists,
   getList,
   deleteList,
-  getItemList,
+  updateItemList,
   deleteItemList,
 } from "./logic";
 
 const app: Application = express();
-app.use(express.json());
 
-app.post("/purchase-list", createList);
-app.get("/purchase-list", getAllLists);
-app.get("/purchase-list/:id", getList);
-app.delete("/purchase-list/:id", deleteList);
-app.patch("/purchase-list/:id/:name", getItemList);
-app.delete("/purchase-list/:id/:name", deleteItemList);
+app.use(express.json());
+app.use("/purchaseList/:id", listExist);
+app.use("/purchaseList/:id/:name", itemExist);
+
+app.post("/purchaseList", createList);
+app.get("/purchaseList", getAllLists);
+app.get("/purchaseList/:id", getList);
+app.delete("/purchaseList/:id", deleteList);
+app.patch("/purchaseList/:id/:name", updateItemList);
+app.delete("/purchaseList/:id/:name", deleteItemList);
 
 const PORT: number = 3000;
 const runningMessage = `Server is Running on http://localhost:${PORT}`;
