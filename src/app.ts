@@ -1,7 +1,6 @@
 import express, { Application } from "express";
+import { listExist, itemExist } from "./middleware";
 import {
-  listExist,
-  itemExist,
   createList,
   getAllLists,
   getList,

@@ -1,91 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { lists, ids } from "./database";
-import {
-  IListsRequest,
-  IProductList,
-  IList,
-  CreateListRequired,
-  CreateItensRequired,
-} from "./interface";
-
-export const listExist = (
-  request: Request,
-  response: Response,
-  next: NextFunction
-) => {
-  const idExist = ids.find((element) => element === +request.params.id);
-  if (!idExist) {
-    return response.status(404).json({
-      message: "List not Found",
-    });
-  }
-  next();
-};
-
-export const itemExist = (
-  request: Request,
-  response: Response,
-  next: NextFunction
-) => {
-  const list = lists.find((element) => element.id === +request.params.id);
-  if (list) {
-    const nameExist = list.data.find((ele) => ele.name === request.params.name);
-
-    if (!nameExist) {
-      return response.status(404).json({
-        message: "Item not Found",
-      });
-    }
-  }
-
-  next();
-};
-
-const validateCreateList = (payload: any): IListsRequest => {
-  const keys: Array<string> = Object.keys(payload);
-  const values: Array<string> = Object.values(payload);
-  const requiredKeys: Array<CreateListRequired> = ["listName", "data"];
-
-  const containsAllKeys: boolean = requiredKeys.every((key: string) => {
-    return keys.includes(key);
-  });
-
-  if (
-    !containsAllKeys ||
-    keys.length > requiredKeys.length ||
-    typeof payload.listName !== "string"
-  ) {
-    throw new Error(`Campos necessarios sao: ${requiredKeys}`);
-  }
-
-  // if (typeof values[2] !== "string") {
-  //   throw new Error(`Campos necessarios sao: ${requiredKeys}`);
-  // }
-
-  return payload;
-};
-
-const validateItemList = (payload: any): IProductList => {
-  const keys: Array<string> = Object.keys(payload);
-  const values: Array<string> = Object.values(payload);
-  const requiredKeys: Array<CreateItensRequired> = ["name", "quantity"];
-
-  const containsAllKeys: boolean = requiredKeys.every((key: string) => {
-    return keys.includes(key);
-  });
-
-  if (!containsAllKeys || keys.length > requiredKeys.length) {
-    throw new Error(`Campos necessarios sao: ${requiredKeys}`);
-  }
-
-  values.map((value) => {
-    if (typeof value !== "string") {
-      throw new Error(`Campos necessarios sao: ${requiredKeys}`);
-    }
-  });
-
-  return payload;
-};
+import { validateCreateList, validateItemList } from "./validade";
+import { IListsRequest, IProductList, IList } from "./interface";
 
 export const createList = (request: Request, response: Response) => {
   try {
@@ -94,7 +10,7 @@ export const createList = (request: Request, response: Response) => {
     const idExist = ids.find((element) => element === id);
     if (idExist) {
       return response.status(409).json({
-        message: "ids already exists",
+        message: "Ids already exists",
       });
     }
 
@@ -133,12 +49,11 @@ export const getList = (request: Request, response: Response) => {
 };
 
 export const deleteList = (request: Request, response: Response) => {
-  lists.map((list) => {
-    if (list.id === +request.params.id) {
-      lists.splice(lists.indexOf(list), 1);
-      return response.status(204).json("NO CONTENT");
-    }
-  });
+  const listIndex: number = request.list.listIndex;
+
+  lists.splice(listIndex, 1);
+
+  return response.status(204).send();
 };
 
 export const updateItemList = (request: Request, response: Response) => {
@@ -169,14 +84,13 @@ export const updateItemList = (request: Request, response: Response) => {
 };
 
 export const deleteItemList = (request: Request, response: Response) => {
-  const itemData: IProductList = request.body;
   lists.map((list) => {
     const itens = list.data;
     if (list.id === +request.params.id) {
       itens.map((item) => {
         if (item.name === request.params.name) {
           itens.splice(itens.indexOf(item), 1);
-          return response.status(204).json("NO CONTENT");
+          return response.status(204).send();
         }
       });
     }
